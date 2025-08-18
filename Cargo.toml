@@ -1,0 +1,62 @@
+[package]
+name = "chip8"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+description = "A modern Chip-8 emulator written in Rust"
+license = "MIT"
+repository = "https://github.com/bclews/chip8"
+keywords = ["emulator", "chip8", "retro", "gaming"]
+categories = ["emulators", "games"]
+
+[dependencies]
+# Error handling
+thiserror = "1.0"
+color-eyre = "0.6"
+anyhow = "1.0"
+log = "0.4"
+
+# CLI interface
+clap = { version = "4.0", features = ["derive"] }
+env_logger = "0.10"
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# File I/O and serialization
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
+
+# Graphics and windowing (for future use)
+winit = "0.28"
+pixels = "0.13"
+
+# Audio (for future use)
+cpal = "0.15"
+rodio = "0.17"
+
+# Random number generation
+rand = "0.8"
+
+[features]
+default = []
+debug-print = []
+
+[dev-dependencies]
+# Testing frameworks
+proptest = "1.0"
+criterion = "0.5"
+tempfile = "3.0"
+
+[[bin]]
+name = "chip8"
+path = "src/main.rs"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.bench]
+debug = true
