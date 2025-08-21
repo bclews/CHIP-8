@@ -9,8 +9,8 @@ pub mod input;
 
 // Re-export commonly used types
 pub use audio::{Audio, AudioResult};
-pub use display::{Display, DisplayResult, DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_PIXELS};
-pub use input::{Input, InputResult, ChipKey};
+pub use display::{Display, DisplayResult, DISPLAY_HEIGHT, DISPLAY_PIXELS, DISPLAY_WIDTH};
+pub use input::{ChipKey, Input, InputResult};
 
 // Re-export error types from the main error module
 pub use crate::error::{AudioError, GraphicsError, InputError};
@@ -21,7 +21,7 @@ use crate::error::EmulatorError;
 pub type HardwareResult<T> = Result<T, EmulatorError>;
 
 /// Hardware abstraction for all Chip-8 I/O systems.
-/// 
+///
 /// This trait combines all hardware interfaces into a single
 /// abstraction that can be easily implemented and tested.
 pub trait Hardware {
@@ -32,9 +32,9 @@ pub trait Hardware {
     fn display(&mut self) -> &mut Self::Display;
     fn audio(&mut self) -> &mut Self::Audio;
     fn input(&mut self) -> &mut Self::Input;
-    
+
     /// Updates all hardware systems.
-    /// 
+    ///
     /// This should be called once per frame to update input state,
     /// render graphics, and handle audio.
     fn update(&mut self) -> HardwareResult<()>;
@@ -94,7 +94,7 @@ mod tests {
     #[test]
     fn test_null_hardware_creation() {
         let mut hardware = NullHardware::new();
-        
+
         // Test that all systems are accessible
         assert!(!hardware.display().is_dirty());
         assert!(!hardware.audio().is_playing());
@@ -104,7 +104,7 @@ mod tests {
     #[test]
     fn test_hardware_update() {
         let mut hardware = NullHardware::new();
-        
+
         // Should not fail with null implementations
         hardware.update().unwrap();
     }

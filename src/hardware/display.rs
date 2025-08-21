@@ -122,7 +122,6 @@ impl SoftwareDisplay {
         }
         Ok(y as usize * DISPLAY_WIDTH + x as usize)
     }
-
 }
 
 impl Default for SoftwareDisplay {
@@ -396,4 +395,3 @@ mod tests {
         display.render().unwrap();
     }
 }
-

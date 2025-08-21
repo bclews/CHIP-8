@@ -2,10 +2,10 @@
 //!
 //! A modern Rust implementation of the classic Chip-8 virtual machine.
 
-use chip8::frontend::cli::{CliApp, run_cli};
+use chip8::frontend::cli::{run_cli, CliApp};
 use chip8::frontend::gui::run_gui;
-use color_eyre::eyre::Result;
 use clap::Parser;
+use color_eyre::eyre::Result;
 
 fn main() -> Result<()> {
     // Install color-eyre for better error handling
@@ -29,6 +29,6 @@ fn main() -> Result<()> {
         // Run the CLI application
         run_cli()?;
     }
-    
+
     Ok(())
 }

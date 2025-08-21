@@ -2,26 +2,26 @@
 //!
 //! This module provides a graphical user interface using `pixels` and `winit`.
 
+use log::debug;
+use pixels::{Pixels, SurfaceTexture};
+use std::cell::RefCell;
 use std::path::PathBuf;
-use std::time::{Instant, Duration};
+use std::rc::Rc;
+use std::time::{Duration, Instant};
 use winit::{
-    event::{Event, WindowEvent, ElementState},
+    event::{ElementState, Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,
 };
-use pixels::{Pixels, SurfaceTexture};
-use std::rc::Rc;
-use std::cell::RefCell;
-use log::debug;
 
+use crate::audio::AudioSystem;
 use crate::error::EmulatorError;
 use crate::frontend::SimpleEmulator;
-use crate::hardware::{DISPLAY_WIDTH, DISPLAY_HEIGHT};
 use crate::graphics::GraphicsDisplay;
-use crate::hardware::input::SoftwareInput;
-use crate::input::mapper::{QwertyMapper, KeyMapper};
 use crate::hardware::input::Input;
-use crate::audio::AudioSystem;
+use crate::hardware::input::SoftwareInput;
+use crate::hardware::{DISPLAY_HEIGHT, DISPLAY_WIDTH};
+use crate::input::mapper::{KeyMapper, QwertyMapper};
 
 /// Runs the GUI application.
 pub fn run_gui(rom_file: PathBuf) -> Result<(), EmulatorError> {
@@ -30,7 +30,11 @@ pub fn run_gui(rom_file: PathBuf) -> Result<(), EmulatorError> {
     let window = WindowBuilder::new()
         .with_title("Chip-8 Emulator")
         .build(&event_loop)
-        .map_err(|e| EmulatorError::Graphics(crate::error::GraphicsError::WindowCreationFailed(e.to_string())))?;
+        .map_err(|e| {
+            EmulatorError::Graphics(crate::error::GraphicsError::WindowCreationFailed(
+                e.to_string(),
+            ))
+        })?;
 
     let mut pixels = {
         let window_size = window.inner_size();
@@ -39,8 +43,7 @@ pub fn run_gui(rom_file: PathBuf) -> Result<(), EmulatorError> {
     };
 
     let mut emulator = SimpleEmulator::new();
-    let graphics_display = GraphicsDisplay::new()
-        .map_err(EmulatorError::Graphics)?;
+    let graphics_display = GraphicsDisplay::new().map_err(EmulatorError::Graphics)?;
     emulator.cpu_mut().set_display(Box::new(graphics_display));
 
     // Initialize audio system
@@ -79,22 +82,23 @@ pub fn run_gui(rom_file: PathBuf) -> Result<(), EmulatorError> {
                             ElementState::Pressed => {
                                 debug!("Pressing ChipKey: {:?}", chip_key);
                                 software_input.borrow_mut().press_key(chip_key);
-                            },
+                            }
                             ElementState::Released => {
                                 debug!("Releasing ChipKey: {:?}", chip_key);
                                 software_input.borrow_mut().release_key(chip_key);
-                            },
+                            }
                         }
                     }
                 }
-            },
+            }
             Event::MainEventsCleared => {
                 let now = Instant::now();
                 let delta_time = now.duration_since(last_frame_time);
                 last_frame_time = now;
 
-                let cycles_to_execute = (delta_time.as_secs_f64() * emulator.target_cps() as f64) as usize;
-                
+                let cycles_to_execute =
+                    (delta_time.as_secs_f64() * emulator.target_cps() as f64) as usize;
+
                 // Update emulator state
                 for _ in 0..cycles_to_execute {
                     if let Err(e) = emulator.step() {
@@ -115,7 +119,7 @@ pub fn run_gui(rom_file: PathBuf) -> Result<(), EmulatorError> {
                     *control_flow = ControlFlow::Exit;
                     return;
                 }
-                
+
                 // Draw the screen
                 let frame = emulator.cpu().get_display_buffer();
                 draw_frame(frame, pixels.frame_mut());

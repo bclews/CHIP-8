@@ -3,8 +3,8 @@
 //! This module provides key mapping functionality to translate
 //! physical keyboard input to Chip-8 hexadecimal keys.
 
+use super::keyboard::{KeyboardEvent, LogicalKey, PhysicalKey};
 use crate::hardware::ChipKey;
-use super::keyboard::{KeyboardEvent, PhysicalKey, LogicalKey};
 use std::collections::HashMap;
 use winit::event::VirtualKeyCode;
 
@@ -12,28 +12,28 @@ use winit::event::VirtualKeyCode;
 pub trait KeyMapper: Send + Sync {
     /// Maps a keyboard event to a Chip-8 key.
     fn map_key_event(&self, event: &KeyboardEvent) -> Option<ChipKey>;
-    
+
     /// Maps a physical key to a Chip-8 key.
     fn map_physical_key(&self, key: PhysicalKey) -> Option<ChipKey>;
-    
+
     /// Maps a logical key to a Chip-8 key.
     fn map_logical_key(&self, key: &LogicalKey) -> Option<ChipKey>;
 
     /// Maps a winit VirtualKeyCode to a Chip-8 key.
     fn map_virtual_keycode(&self, key: VirtualKeyCode) -> Option<ChipKey>;
-    
+
     /// Gets all key mappings as (PhysicalKey, ChipKey) pairs.
     fn get_physical_mappings(&self) -> Vec<(PhysicalKey, ChipKey)>;
-    
+
     /// Gets the name of this key mapper.
     fn name(&self) -> &str;
-    
+
     /// Gets a description of the key layout.
     fn description(&self) -> &str;
 }
 
 /// QWERTY keyboard mapper for Chip-8 keys.
-/// 
+///
 /// Maps the Chip-8 keypad to QWERTY keys as follows:
 /// ```text
 /// Chip-8:    QWERTY:
@@ -54,7 +54,7 @@ impl QwertyMapper {
         let mut physical_map = HashMap::new();
         let mut logical_map = HashMap::new();
         let mut virtual_keycode_map = HashMap::new();
-        
+
         // Physical key mappings
         physical_map.insert(PhysicalKey::Key1, ChipKey::Key1);
         physical_map.insert(PhysicalKey::Key2, ChipKey::Key2);
@@ -72,7 +72,7 @@ impl QwertyMapper {
         physical_map.insert(PhysicalKey::KeyX, ChipKey::Key0);
         physical_map.insert(PhysicalKey::KeyC, ChipKey::KeyB);
         physical_map.insert(PhysicalKey::KeyV, ChipKey::KeyF);
-        
+
         // Logical key mappings (for character keys)
         logical_map.insert(LogicalKey::Character('1'), ChipKey::Key1);
         logical_map.insert(LogicalKey::Character('2'), ChipKey::Key2);
@@ -120,7 +120,7 @@ impl QwertyMapper {
         virtual_keycode_map.insert(VirtualKeyCode::X, ChipKey::Key0);
         virtual_keycode_map.insert(VirtualKeyCode::C, ChipKey::KeyB);
         virtual_keycode_map.insert(VirtualKeyCode::V, ChipKey::KeyF);
-        
+
         Self {
             physical_map,
             logical_map,
@@ -141,11 +141,11 @@ impl KeyMapper for QwertyMapper {
         self.map_logical_key(&event.logical_key)
             .or_else(|| self.map_physical_key(event.physical_key))
     }
-    
+
     fn map_physical_key(&self, key: PhysicalKey) -> Option<ChipKey> {
         self.physical_map.get(&key).copied()
     }
-    
+
     fn map_logical_key(&self, key: &LogicalKey) -> Option<ChipKey> {
         self.logical_map.get(key).copied()
     }
@@ -153,15 +153,15 @@ impl KeyMapper for QwertyMapper {
     fn map_virtual_keycode(&self, key: VirtualKeyCode) -> Option<ChipKey> {
         self.virtual_keycode_map.get(&key).copied()
     }
-    
+
     fn get_physical_mappings(&self) -> Vec<(PhysicalKey, ChipKey)> {
         self.physical_map.iter().map(|(&k, &v)| (k, v)).collect()
     }
-    
+
     fn name(&self) -> &str {
         "QWERTY"
     }
-    
+
     fn description(&self) -> &str {
         r"Standard QWERTY keyboard layout:
 1 2 3 4 -> 1 2 3 C
@@ -186,7 +186,7 @@ impl Default for AlternativeQwertyMapper {
 
 impl AlternativeQwertyMapper {
     /// Creates a new alternative QWERTY mapper.
-    /// 
+    ///
     /// Uses the numpad-like layout on the left side of QWERTY:
     /// ```text
     /// Chip-8:    QWERTY:
@@ -199,7 +199,7 @@ impl AlternativeQwertyMapper {
         let mut physical_map = HashMap::new();
         let mut logical_map = HashMap::new();
         let mut virtual_keycode_map = HashMap::new();
-        
+
         // Use the same mappings as QwertyMapper for now
         // This could be extended with different layouts
         physical_map.insert(PhysicalKey::Key1, ChipKey::Key1);
@@ -218,7 +218,7 @@ impl AlternativeQwertyMapper {
         physical_map.insert(PhysicalKey::KeyX, ChipKey::Key0);
         physical_map.insert(PhysicalKey::KeyC, ChipKey::KeyB);
         physical_map.insert(PhysicalKey::KeyV, ChipKey::KeyF);
-        
+
         // Add logical mappings
         for (&physical, &chip) in &physical_map {
             let logical = super::keyboard::KeyboardInput::physical_to_logical(physical);
@@ -242,7 +242,7 @@ impl AlternativeQwertyMapper {
         virtual_keycode_map.insert(VirtualKeyCode::X, ChipKey::Key0);
         virtual_keycode_map.insert(VirtualKeyCode::C, ChipKey::KeyB);
         virtual_keycode_map.insert(VirtualKeyCode::V, ChipKey::KeyF);
-        
+
         Self {
             physical_map,
             logical_map,
@@ -256,11 +256,11 @@ impl KeyMapper for AlternativeQwertyMapper {
         self.map_logical_key(&event.logical_key)
             .or_else(|| self.map_physical_key(event.physical_key))
     }
-    
+
     fn map_physical_key(&self, key: PhysicalKey) -> Option<ChipKey> {
         self.physical_map.get(&key).copied()
     }
-    
+
     fn map_logical_key(&self, key: &LogicalKey) -> Option<ChipKey> {
         self.logical_map.get(key).copied()
     }
@@ -268,15 +268,15 @@ impl KeyMapper for AlternativeQwertyMapper {
     fn map_virtual_keycode(&self, key: VirtualKeyCode) -> Option<ChipKey> {
         self.virtual_keycode_map.get(&key).copied()
     }
-    
+
     fn get_physical_mappings(&self) -> Vec<(PhysicalKey, ChipKey)> {
         self.physical_map.iter().map(|(&k, &v)| (k, v)).collect()
     }
-    
+
     fn name(&self) -> &str {
         "Alternative QWERTY"
     }
-    
+
     fn description(&self) -> &str {
         "Alternative QWERTY keyboard layout"
     }
@@ -302,12 +302,12 @@ impl CustomMapper {
             description,
         }
     }
-    
+
     /// Adds a physical key mapping.
     pub fn add_physical_mapping(&mut self, physical: PhysicalKey, chip: ChipKey) {
         self.physical_map.insert(physical, chip);
     }
-    
+
     /// Adds a logical key mapping.
     pub fn add_logical_mapping(&mut self, logical: LogicalKey, chip: ChipKey) {
         self.logical_map.insert(logical, chip);
@@ -317,12 +317,12 @@ impl CustomMapper {
     pub fn add_virtual_keycode_mapping(&mut self, virtual_keycode: VirtualKeyCode, chip: ChipKey) {
         self.virtual_keycode_map.insert(virtual_keycode, chip);
     }
-    
+
     /// Removes a physical key mapping.
     pub fn remove_physical_mapping(&mut self, physical: PhysicalKey) {
         self.physical_map.remove(&physical);
     }
-    
+
     /// Removes a logical key mapping.
     pub fn remove_logical_mapping(&mut self, logical: &LogicalKey) {
         self.logical_map.remove(logical);
@@ -332,14 +332,14 @@ impl CustomMapper {
     pub fn remove_virtual_keycode_mapping(&mut self, virtual_keycode: VirtualKeyCode) {
         self.virtual_keycode_map.remove(&virtual_keycode);
     }
-    
+
     /// Clears all mappings.
     pub fn clear_mappings(&mut self) {
         self.physical_map.clear();
         self.logical_map.clear();
         self.virtual_keycode_map.clear();
     }
-    
+
     /// Loads mappings from a QWERTY mapper.
     pub fn load_from_qwerty(&mut self) {
         let qwerty = QwertyMapper::new();
@@ -354,11 +354,11 @@ impl KeyMapper for CustomMapper {
         self.map_logical_key(&event.logical_key)
             .or_else(|| self.map_physical_key(event.physical_key))
     }
-    
+
     fn map_physical_key(&self, key: PhysicalKey) -> Option<ChipKey> {
         self.physical_map.get(&key).copied()
     }
-    
+
     fn map_logical_key(&self, key: &LogicalKey) -> Option<ChipKey> {
         self.logical_map.get(key).copied()
     }
@@ -366,15 +366,15 @@ impl KeyMapper for CustomMapper {
     fn map_virtual_keycode(&self, key: VirtualKeyCode) -> Option<ChipKey> {
         self.virtual_keycode_map.get(&key).copied()
     }
-    
+
     fn get_physical_mappings(&self) -> Vec<(PhysicalKey, ChipKey)> {
         self.physical_map.iter().map(|(&k, &v)| (k, v)).collect()
     }
-    
+
     fn name(&self) -> &str {
         &self.name
     }
-    
+
     fn description(&self) -> &str {
         &self.description
     }
@@ -398,43 +398,79 @@ pub fn get_available_mappers() -> Vec<&'static str> {
 mod tests {
     use super::*;
     use crate::hardware::ChipKey;
-    
+
     #[test]
     fn test_qwerty_mapper_creation() {
         let mapper = QwertyMapper::new();
-        
+
         assert_eq!(mapper.name(), "QWERTY");
         assert!(!mapper.description().is_empty());
     }
-    
+
     #[test]
     fn test_qwerty_physical_mappings() {
         let mapper = QwertyMapper::new();
-        
-        assert_eq!(mapper.map_physical_key(PhysicalKey::Key1), Some(ChipKey::Key1));
-        assert_eq!(mapper.map_physical_key(PhysicalKey::KeyQ), Some(ChipKey::Key4));
-        assert_eq!(mapper.map_physical_key(PhysicalKey::KeyA), Some(ChipKey::Key7));
-        assert_eq!(mapper.map_physical_key(PhysicalKey::KeyZ), Some(ChipKey::KeyA));
-        assert_eq!(mapper.map_physical_key(PhysicalKey::KeyX), Some(ChipKey::Key0));
-        assert_eq!(mapper.map_physical_key(PhysicalKey::KeyV), Some(ChipKey::KeyF));
+
+        assert_eq!(
+            mapper.map_physical_key(PhysicalKey::Key1),
+            Some(ChipKey::Key1)
+        );
+        assert_eq!(
+            mapper.map_physical_key(PhysicalKey::KeyQ),
+            Some(ChipKey::Key4)
+        );
+        assert_eq!(
+            mapper.map_physical_key(PhysicalKey::KeyA),
+            Some(ChipKey::Key7)
+        );
+        assert_eq!(
+            mapper.map_physical_key(PhysicalKey::KeyZ),
+            Some(ChipKey::KeyA)
+        );
+        assert_eq!(
+            mapper.map_physical_key(PhysicalKey::KeyX),
+            Some(ChipKey::Key0)
+        );
+        assert_eq!(
+            mapper.map_physical_key(PhysicalKey::KeyV),
+            Some(ChipKey::KeyF)
+        );
     }
-    
+
     #[test]
     fn test_qwerty_logical_mappings() {
         let mapper = QwertyMapper::new();
-        
-        assert_eq!(mapper.map_logical_key(&LogicalKey::Character('1')), Some(ChipKey::Key1));
-        assert_eq!(mapper.map_logical_key(&LogicalKey::Character('q')), Some(ChipKey::Key4));
-        assert_eq!(mapper.map_logical_key(&LogicalKey::Character('Q')), Some(ChipKey::Key4));
-        assert_eq!(mapper.map_logical_key(&LogicalKey::Character('a')), Some(ChipKey::Key7));
-        assert_eq!(mapper.map_logical_key(&LogicalKey::Character('x')), Some(ChipKey::Key0));
-        assert_eq!(mapper.map_logical_key(&LogicalKey::Character('v')), Some(ChipKey::KeyF));
+
+        assert_eq!(
+            mapper.map_logical_key(&LogicalKey::Character('1')),
+            Some(ChipKey::Key1)
+        );
+        assert_eq!(
+            mapper.map_logical_key(&LogicalKey::Character('q')),
+            Some(ChipKey::Key4)
+        );
+        assert_eq!(
+            mapper.map_logical_key(&LogicalKey::Character('Q')),
+            Some(ChipKey::Key4)
+        );
+        assert_eq!(
+            mapper.map_logical_key(&LogicalKey::Character('a')),
+            Some(ChipKey::Key7)
+        );
+        assert_eq!(
+            mapper.map_logical_key(&LogicalKey::Character('x')),
+            Some(ChipKey::Key0)
+        );
+        assert_eq!(
+            mapper.map_logical_key(&LogicalKey::Character('v')),
+            Some(ChipKey::KeyF)
+        );
     }
-    
+
     #[test]
     fn test_qwerty_key_event_mapping() {
         let mapper = QwertyMapper::new();
-        
+
         let event = KeyboardEvent {
             physical_key: PhysicalKey::Key1,
             logical_key: LogicalKey::Character('1'),
@@ -442,65 +478,69 @@ mod tests {
             is_repeat: false,
             timestamp: std::time::Instant::now(),
         };
-        
+
         assert_eq!(mapper.map_key_event(&event), Some(ChipKey::Key1));
     }
-    
+
     #[test]
     fn test_qwerty_all_mappings() {
         let mapper = QwertyMapper::new();
         let mappings = mapper.get_physical_mappings();
-        
+
         // Should have 16 mappings (one for each Chip-8 key)
         assert_eq!(mappings.len(), 16);
-        
+
         // Check that all Chip-8 keys are mapped
-        let chip_keys: std::collections::HashSet<_> = mappings.iter().map(|(_, chip)| *chip).collect();
+        let chip_keys: std::collections::HashSet<_> =
+            mappings.iter().map(|(_, chip)| *chip).collect();
         assert_eq!(chip_keys.len(), 16);
-        
+
         for expected_key in ChipKey::all_keys() {
             assert!(chip_keys.contains(&expected_key));
         }
     }
-    
+
     #[test]
     fn test_custom_mapper() {
-        let mut mapper = CustomMapper::new(
-            "Test Mapper".to_string(),
-            "A test mapper".to_string(),
-        );
-        
+        let mut mapper = CustomMapper::new("Test Mapper".to_string(), "A test mapper".to_string());
+
         assert_eq!(mapper.name(), "Test Mapper");
         assert_eq!(mapper.description(), "A test mapper");
-        
+
         // Initially no mappings
         assert_eq!(mapper.map_physical_key(PhysicalKey::Key1), None);
-        
+
         // Add a mapping
         mapper.add_physical_mapping(PhysicalKey::Key1, ChipKey::Key1);
-        assert_eq!(mapper.map_physical_key(PhysicalKey::Key1), Some(ChipKey::Key1));
-        
+        assert_eq!(
+            mapper.map_physical_key(PhysicalKey::Key1),
+            Some(ChipKey::Key1)
+        );
+
         // Remove mapping
         mapper.remove_physical_mapping(PhysicalKey::Key1);
         assert_eq!(mapper.map_physical_key(PhysicalKey::Key1), None);
-        
+
         // Load from QWERTY
         mapper.load_from_qwerty();
-        assert_eq!(mapper.map_physical_key(PhysicalKey::Key1), Some(ChipKey::Key1));
+        assert_eq!(
+            mapper.map_physical_key(PhysicalKey::Key1),
+            Some(ChipKey::Key1)
+        );
     }
-    
+
     #[test]
     fn test_mapper_creation_from_config() {
         let qwerty = create_mapper_from_config("qwerty").unwrap();
         assert_eq!(qwerty.name(), "QWERTY");
-        
+
         let alt = create_mapper_from_config("alternative").unwrap();
         assert_eq!(alt.name(), "Alternative QWERTY");
-        
+
         let invalid = create_mapper_from_config("invalid");
         assert!(invalid.is_err());
     }
-    
+
     #[test]
     fn test_available_mappers() {
         let mappers = get_available_mappers();

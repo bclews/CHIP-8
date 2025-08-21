@@ -16,10 +16,10 @@ pub mod input;
 pub mod test_utils;
 
 // Re-export commonly used types
-pub use audio::{AudioSystem, NullAudioSystem, AudioBuzzer, BuzzerConfig};
+pub use audio::{AudioBuzzer, AudioSystem, BuzzerConfig, NullAudioSystem};
 pub use emulator::{Cpu, CpuState, Memory, Registers, Stack, Timers};
 pub use error::{EmulatorError, Result};
-pub use frontend::{SimpleEmulator, EmulatorConfig, CliApp};
-pub use graphics::{GraphicsDisplay, GraphicsConfig};
-pub use hardware::{Hardware, NullHardware, Audio, Display, Input};
-pub use input::{InputSystem, NullInputSystem, KeyboardInput, QwertyMapper};
+pub use frontend::{CliApp, EmulatorConfig, SimpleEmulator};
+pub use graphics::{GraphicsConfig, GraphicsDisplay};
+pub use hardware::{Audio, Display, Hardware, Input, NullHardware};
+pub use input::{InputSystem, KeyboardInput, NullInputSystem, QwertyMapper};

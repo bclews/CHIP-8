@@ -11,7 +11,7 @@ pub mod timers;
 
 // Re-export commonly used types
 pub use cpu::{Cpu, CpuState};
-pub use memory::{Memory, MEMORY_SIZE, PROGRAM_START, FONT_START};
-pub use registers::{Registers, NUM_REGISTERS, FLAG_REGISTER};
+pub use memory::{Memory, FONT_START, MEMORY_SIZE, PROGRAM_START};
+pub use registers::{Registers, FLAG_REGISTER, NUM_REGISTERS};
 pub use stack::{Stack, STACK_SIZE};
 pub use timers::{Timers, TIMER_FREQUENCY};
