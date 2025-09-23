@@ -408,25 +408,25 @@ mod tests {
     #[test]
     fn test_stack_overflow_underflow_edge_cases() {
         let mut stack = Stack::new();
-        
+
         // Test underflow with multiple attempts
         assert!(stack.pop().is_err());
         assert!(stack.pop().is_err()); // Should still fail
         assert!(stack.peek().is_err());
-        
+
         // Fill stack to capacity
         for i in 0..16 {
             assert!(stack.push(i * 0x100).is_ok());
         }
-        
+
         // Test overflow with multiple attempts
         assert!(stack.push(0x1000).is_err());
         assert!(stack.push(0x2000).is_err()); // Should still fail
-        
+
         // Test that we can still pop after overflow attempts
         assert_eq!(stack.pop().unwrap(), 15 * 0x100);
         assert_eq!(stack.depth(), 15);
-        
+
         // Should be able to push again after pop
         assert!(stack.push(0x9999).is_ok());
         assert_eq!(stack.peek().unwrap(), 0x9999);
@@ -435,23 +435,23 @@ mod tests {
     #[test]
     fn test_stack_capacity_management() {
         let mut stack = Stack::new();
-        
+
         // Test is_full and is_empty edge cases
         assert!(stack.is_empty());
         assert!(!stack.is_full());
         assert_eq!(stack.remaining_capacity(), STACK_SIZE);
-        
+
         // Fill stack one by one, testing capacity at each step
         for i in 0..16 {
             assert_eq!(stack.remaining_capacity(), STACK_SIZE - i);
             stack.push(i as u16).unwrap();
             assert_eq!(stack.depth(), i + 1);
         }
-        
+
         assert!(stack.is_full());
         assert!(!stack.is_empty());
         assert_eq!(stack.remaining_capacity(), 0);
-        
+
         // Empty stack one by one
         for i in (0..16).rev() {
             assert_eq!(stack.depth(), i + 1);
@@ -459,7 +459,7 @@ mod tests {
             assert_eq!(value, i as u16);
             assert_eq!(stack.remaining_capacity(), STACK_SIZE - i);
         }
-        
+
         assert!(stack.is_empty());
         assert!(!stack.is_full());
     }
@@ -467,22 +467,22 @@ mod tests {
     #[test]
     fn test_stack_data_integrity() {
         let mut stack = Stack::new();
-        
+
         // Test that cleared values don't interfere
         stack.push(0xDEAD).unwrap();
         stack.push(0xBEEF).unwrap();
-        
+
         let value = stack.pop().unwrap();
         assert_eq!(value, 0xBEEF);
-        
+
         // The data array should have been cleared for the popped position
         let contents = stack.get_contents();
         assert_eq!(contents, vec![0xDEAD]);
-        
+
         // Push new value should work correctly
         stack.push(0xCAFE).unwrap();
         assert_eq!(stack.peek().unwrap(), 0xCAFE);
-        
+
         let all_contents = stack.get_contents();
         assert_eq!(all_contents, vec![0xDEAD, 0xCAFE]);
     }

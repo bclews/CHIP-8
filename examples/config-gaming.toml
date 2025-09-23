@@ -1,0 +1,35 @@
+# Gaming Configuration - Optimized for Modern Gameplay
+# Usage: chip8 --config config-gaming.toml roms/your-game.ch8
+
+[behavior]
+cpu_speed = 700  # Faster, more responsive
+memory_wraparound = false
+strict_bounds = true
+timer_frequency = 60
+
+[graphics]
+scale_factor = 12  # Larger window
+# High contrast white on black
+foreground_color = { r = 255, g = 255, b = 255, a = 255 }
+background_color = { r = 0, g = 0, b = 0, a = 255 }
+smooth_scaling = false  # Crisp pixels
+maintain_aspect_ratio = true
+
+[audio]
+frequency = 800.0  # Higher pitch, less distracting
+volume = 0.4
+waveform = "Sine"  # Smoother, less harsh
+sample_rate = 44100
+buffer_size = 256  # Lower latency
+
+[keyboard]
+capture_enabled = true
+polling_rate = 120  # More responsive for gaming
+handle_repeats = false  # Cleaner input for games
+repeat_delay = 100
+use_raw_input = true  # Direct input, no OS interference
+
+[debug]
+enabled = false
+break_on_error = false
+log_instructions = false

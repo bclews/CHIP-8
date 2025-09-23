@@ -5,9 +5,9 @@
 
 #[cfg(test)]
 pub mod helpers {
+    use crate::audio::buzzer::{AudioBuzzer, BuzzerConfig};
     use crate::emulator::{Cpu, Memory, Registers, Stack};
     use crate::error::Result;
-    use crate::audio::buzzer::{AudioBuzzer, BuzzerConfig};
 
     /// Creates a new CPU with default initialization for testing.
     pub fn create_test_cpu() -> Cpu {
@@ -123,12 +123,15 @@ pub mod helpers {
     /// Assert audio samples match within tolerance.
     pub fn assert_audio_samples_equal(expected: &[f32], actual: &[f32], tolerance: f32) {
         assert_eq!(expected.len(), actual.len(), "Sample buffer lengths differ");
-        
+
         for (i, (&exp, &act)) in expected.iter().zip(actual.iter()).enumerate() {
             assert!(
                 (exp - act).abs() <= tolerance,
                 "Sample {} differs: expected {}, got {} (tolerance: {})",
-                i, exp, act, tolerance
+                i,
+                exp,
+                act,
+                tolerance
             );
         }
     }
@@ -137,16 +140,16 @@ pub mod helpers {
     pub fn create_test_data(seed: u64, size: usize) -> Vec<u8> {
         use std::collections::hash_map::DefaultHasher;
         use std::hash::{Hash, Hasher};
-        
+
         let mut data = Vec::with_capacity(size);
         let mut hasher = DefaultHasher::new();
         seed.hash(&mut hasher);
-        
+
         for i in 0..size {
             i.hash(&mut hasher);
             data.push((hasher.finish() & 0xFF) as u8);
         }
-        
+
         data
     }
 
@@ -154,7 +157,7 @@ pub mod helpers {
     pub fn create_comprehensive_test_rom() -> Vec<u8> {
         create_test_rom(&[
             0x6000, // LD V0, 0
-            0x6101, // LD V1, 1  
+            0x6101, // LD V1, 1
             0x8010, // LD V0, V1
             0x7001, // ADD V0, 1
             0x8012, // ADD V0, V1
@@ -167,10 +170,10 @@ pub mod helpers {
         // Test valid boundaries
         memory.write_byte(0, 0x42)?;
         assert_eq!(memory.read_byte(0)?, 0x42);
-        
+
         memory.write_byte(4095, 0x84)?;
         assert_eq!(memory.read_byte(4095)?, 0x84);
-        
+
         Ok(())
     }
 
@@ -250,7 +253,7 @@ mod tests {
     fn test_audio_samples_equal() {
         let samples1 = [0.1, 0.2, 0.3];
         let samples2 = [0.11, 0.19, 0.31];
-        
+
         // Should pass with sufficient tolerance
         assert_audio_samples_equal(&samples1, &samples2, 0.02);
     }
@@ -258,9 +261,9 @@ mod tests {
     #[test]
     fn test_deterministic_data() {
         let data1 = create_test_data(42, 10);
-        let data2 = create_test_data(42, 10); 
+        let data2 = create_test_data(42, 10);
         assert_eq!(data1, data2); // Should be deterministic
-        
+
         let data3 = create_test_data(43, 10);
         assert_ne!(data1, data3); // Different seed = different data
     }
@@ -268,7 +271,7 @@ mod tests {
     #[test]
     fn test_comprehensive_test_rom() {
         let rom = create_comprehensive_test_rom();
-        assert!(rom.len() > 0);
+        assert!(!rom.is_empty());
         assert_eq!(rom.len() % 2, 0); // Should be even length (2 bytes per instruction)
     }
 

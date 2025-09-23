@@ -2,7 +2,7 @@
 name = "chip8"
 version = "0.1.0"
 edition = "2021"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Ben Clews"]
 description = "A modern Chip-8 emulator written in Rust"
 license = "MIT"
 repository = "https://github.com/bclews/chip8"

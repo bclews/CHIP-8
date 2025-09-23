@@ -6,11 +6,23 @@
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
-use super::cli::DebugConfig;
 use crate::audio::BuzzerConfig;
 use crate::error::{ConfigError, EmulatorError};
 use crate::graphics::GraphicsConfig;
 use crate::input::KeyboardConfig;
+
+/// Debug configuration.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct DebugConfig {
+    /// Enable debug mode.
+    pub enabled: bool,
+
+    /// Break execution on errors.
+    pub break_on_error: bool,
+
+    /// Log CPU instructions.
+    pub log_instructions: bool,
+}
 
 /// Emulator behavior configuration for compatibility.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -557,7 +569,7 @@ mod tests {
         assert_eq!(classic.graphics.scale_factor, 10);
         assert_eq!(classic.audio.volume, 0.3);
         assert!(classic.validate().is_ok());
-        
+
         // Test modern configuration
         let modern = EmulatorConfig::modern();
         assert!(!modern.behavior.memory_wraparound);
@@ -566,8 +578,8 @@ mod tests {
         assert_eq!(modern.graphics.scale_factor, 12);
         assert_eq!(modern.audio.frequency, 440.0);
         assert!(modern.validate().is_ok());
-        
-        // Test gaming configuration  
+
+        // Test gaming configuration
         let gaming = EmulatorConfig::gaming();
         assert_eq!(gaming.behavior.cpu_speed, 700); // Uses modern behavior
         assert_eq!(gaming.graphics.scale_factor, 12);
@@ -575,7 +587,7 @@ mod tests {
         assert!(!gaming.debug.enabled); // Debug disabled for performance
         assert_eq!(gaming.audio.frequency, 800.0);
         assert!(gaming.validate().is_ok());
-        
+
         // Test development configuration
         let development = EmulatorConfig::development();
         assert!(development.debug.enabled); // Debug-friendly
@@ -600,58 +612,58 @@ mod tests {
     fn test_configuration_validation_edge_cases() {
         // Test boundary values for scale factor
         let mut config = EmulatorConfig::default();
-        
+
         config.graphics.scale_factor = 1; // Valid minimum
         assert!(config.validate().is_ok());
-        
+
         config.graphics.scale_factor = 20; // Valid maximum
         assert!(config.validate().is_ok());
-        
+
         config.graphics.scale_factor = 0; // Invalid
         assert!(config.validate().is_err());
-        
-        config.graphics.scale_factor = 21; // Invalid  
+
+        config.graphics.scale_factor = 21; // Invalid
         assert!(config.validate().is_err());
-        
+
         // Test boundary values for audio volume
         config = EmulatorConfig::default();
-        
+
         config.audio.volume = 0.0; // Valid minimum
         assert!(config.validate().is_ok());
-        
+
         config.audio.volume = 1.0; // Valid maximum
         assert!(config.validate().is_ok());
-        
+
         config.audio.volume = -0.1; // Invalid
         assert!(config.validate().is_err());
-        
+
         config.audio.volume = 1.1; // Invalid
         assert!(config.validate().is_err());
-        
+
         // Test frequency validation
         config = EmulatorConfig::default();
-        
+
         config.audio.frequency = 0.0; // Valid minimum
         assert!(config.validate().is_ok());
-        
+
         config.audio.frequency = 20000.0; // High but valid
         assert!(config.validate().is_ok());
-        
+
         config.audio.frequency = -1.0; // Invalid
         assert!(config.validate().is_err());
-        
+
         // Test keyboard polling rate
         config = EmulatorConfig::default();
-        
+
         config.keyboard.polling_rate = 1; // Valid minimum
         assert!(config.validate().is_ok());
-        
+
         config.keyboard.polling_rate = 1000; // Valid maximum
         assert!(config.validate().is_ok());
-        
+
         config.keyboard.polling_rate = 0; // Invalid
         assert!(config.validate().is_err());
-        
+
         config.keyboard.polling_rate = 1001; // Invalid
         assert!(config.validate().is_err());
     }
@@ -660,12 +672,12 @@ mod tests {
     fn test_configuration_serialization_all_presets() {
         let presets = [
             EmulatorConfig::classic(),
-            EmulatorConfig::modern(), 
+            EmulatorConfig::modern(),
             EmulatorConfig::gaming(),
             EmulatorConfig::development(),
             EmulatorConfig::retro(),
         ];
-        
+
         for preset in presets {
             // Test TOML serialization
             let toml_str = toml::to_string(&preset).unwrap();
@@ -673,17 +685,23 @@ mod tests {
             assert!(toml_str.contains("[behavior]"));
             assert!(toml_str.contains("[graphics]"));
             assert!(toml_str.contains("[audio]"));
-            
+
             // Test deserialization
             let deserialized: EmulatorConfig = toml::from_str(&toml_str).unwrap();
-            
+
             // Verify key properties are preserved
             assert_eq!(preset.behavior.cpu_speed, deserialized.behavior.cpu_speed);
-            assert_eq!(preset.behavior.memory_wraparound, deserialized.behavior.memory_wraparound);
-            assert_eq!(preset.graphics.scale_factor, deserialized.graphics.scale_factor);
+            assert_eq!(
+                preset.behavior.memory_wraparound,
+                deserialized.behavior.memory_wraparound
+            );
+            assert_eq!(
+                preset.graphics.scale_factor,
+                deserialized.graphics.scale_factor
+            );
             assert_eq!(preset.audio.volume, deserialized.audio.volume);
             assert_eq!(preset.debug.enabled, deserialized.debug.enabled);
-            
+
             // Validate deserialized config
             assert!(deserialized.validate().is_ok());
         }
@@ -693,18 +711,18 @@ mod tests {
     fn test_config_merge_functionality() {
         let mut base_config = EmulatorConfig::classic();
         let modern_config = EmulatorConfig::modern();
-        
+
         // Verify initial state
         assert_eq!(base_config.behavior.cpu_speed, 500);
         assert_eq!(base_config.graphics.scale_factor, 10);
-        
+
         // Merge modern into classic
         base_config.merge(&modern_config);
-        
+
         // Should have modern's graphics and audio settings
         assert_eq!(base_config.graphics.scale_factor, 12);
         assert_eq!(base_config.audio.frequency, 440.0);
-        
+
         // But behavior config isn't touched by merge (it's not included)
         // This tests the current implementation
         assert_eq!(base_config.behavior.cpu_speed, 500); // Still classic value
@@ -712,12 +730,19 @@ mod tests {
 
     #[test]
     fn test_profile_creation_comprehensive() {
-        let profile_names = ["default", "gaming", "development", "dev", "retro", "classic"];
-        
+        let profile_names = [
+            "default",
+            "gaming",
+            "development",
+            "dev",
+            "retro",
+            "classic",
+        ];
+
         for name in profile_names {
             let config = ConfigProfiles::from_name(name).unwrap();
             assert!(config.validate().is_ok());
-            
+
             // Verify each profile has expected characteristics
             match name {
                 "gaming" => {
@@ -738,13 +763,13 @@ mod tests {
                 _ => {}
             }
         }
-        
+
         // Test invalid profile names
         let invalid_names = ["invalid", "unknown", ""];
         for name in invalid_names {
             assert!(ConfigProfiles::from_name(name).is_err());
         }
-        
+
         // Test that case-insensitive matching works
         assert!(ConfigProfiles::from_name("GAMING").is_ok());
         assert!(ConfigProfiles::from_name("Development").is_ok());
@@ -753,40 +778,40 @@ mod tests {
     #[test]
     fn test_environment_variable_overrides() {
         use std::env;
-        
+
         // Save original values
         let original_scale = env::var("CHIP8_SCALE").ok();
         let original_volume = env::var("CHIP8_VOLUME").ok();
-        
+
         // Set test values
         env::set_var("CHIP8_SCALE", "15");
         env::set_var("CHIP8_VOLUME", "0.8");
         env::set_var("CHIP8_DEBUG", "1");
-        
+
         let mut config = EmulatorConfig::default();
         EnvConfig::apply_env_overrides(&mut config);
-        
+
         // Check overrides were applied
         assert_eq!(config.graphics.scale_factor, 15);
         assert_eq!(config.audio.volume, 0.8);
         assert!(config.debug.enabled);
-        
+
         // Test invalid values are ignored
         env::set_var("CHIP8_SCALE", "0"); // Invalid
         env::set_var("CHIP8_VOLUME", "2.0"); // Invalid
-        
+
         let mut config2 = EmulatorConfig::default();
         EnvConfig::apply_env_overrides(&mut config2);
-        
+
         // Should keep default values for invalid overrides
         assert_eq!(config2.graphics.scale_factor, 10); // Default value
         assert_eq!(config2.audio.volume, 0.4); // Default value
-        
+
         // Cleanup
         env::remove_var("CHIP8_SCALE");
         env::remove_var("CHIP8_VOLUME");
         env::remove_var("CHIP8_DEBUG");
-        
+
         // Restore original values if they existed
         if let Some(scale) = original_scale {
             env::set_var("CHIP8_SCALE", scale);

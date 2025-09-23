@@ -58,14 +58,8 @@ tramp
 *.sublime-workspace
 
 # =============================================================================
-# Testing and Coverage
+# Testing
 # =============================================================================
-
-# Test coverage reports
-coverage/
-tarpaulin-report.html
-lcov.info
-cobertura.xml
 
 # Test artifacts
 tests/tmp/

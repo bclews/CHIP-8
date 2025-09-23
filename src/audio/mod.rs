@@ -174,10 +174,10 @@ mod tests {
     fn test_audio_system_with_config() {
         let buzzer_config = BuzzerConfig::new().with_frequency(880.0);
         let stream_config = StreamConfig::new();
-        
+
         // This might fail in headless environments, which is expected
         let result = AudioSystem::with_config(buzzer_config, stream_config);
-        
+
         if let Ok(system) = result {
             assert!(!system.is_playing());
             assert!(!system.is_initialized());
@@ -189,10 +189,10 @@ mod tests {
     #[test]
     fn test_audio_system_stream_initialization() {
         let mut system = AudioSystem::default();
-        
+
         // Test initialization with default config
         let result = system.initialize_with_defaults();
-        
+
         // May fail without audio hardware - that's expected behavior
         match result {
             Ok(_) => {
@@ -213,24 +213,24 @@ mod tests {
     #[test]
     fn test_audio_system_full_workflow() {
         let mut system = AudioSystem::default();
-        
+
         // Test complete workflow - may fail, that's ok
         let _play_result = system.play_beep();
-        
+
         // Volume and frequency should always work
         system.set_volume(0.5).unwrap();
         assert_eq!(system.get_volume(), 0.5);
-        
+
         system.set_frequency(1000.0).unwrap();
         assert_eq!(system.get_frequency(), 1000.0);
-        
+
         // Test that stop doesn't error even if play failed
         let _stop_result = system.stop_beep();
-        
+
         // Test edge cases for volume and frequency
         system.set_volume(0.0).unwrap();
         assert_eq!(system.get_volume(), 0.0);
-        
+
         system.set_volume(1.0).unwrap();
         assert_eq!(system.get_volume(), 1.0);
     }
@@ -238,22 +238,22 @@ mod tests {
     #[test]
     fn test_audio_system_state_management() {
         let mut system = AudioSystem::default();
-        
+
         // Initial state
         assert!(!system.is_playing());
         assert!(!system.is_initialized());
-        
+
         // Test state consistency after operations
         let _result = system.play_beep();
         // is_playing() should reflect actual buzzer state
         let playing_state = system.is_playing();
-        
+
         let _result = system.stop_beep();
         if playing_state {
             // If play worked, stop should make it not playing
             assert!(!system.is_playing());
         }
-        
+
         // Test initialization state tracking
         let init_result = system.initialize_with_defaults();
         match init_result {
@@ -265,31 +265,31 @@ mod tests {
     #[test]
     fn test_null_audio_system_comprehensive() {
         let mut system = NullAudioSystem::new();
-        
+
         // Test all operations work perfectly with null system
         assert!(!system.is_playing());
-        
+
         system.play_beep().unwrap();
         assert!(system.is_playing());
-        
+
         // Test volume range
         system.set_volume(0.0).unwrap();
         assert_eq!(system.get_volume(), 0.0);
-        
+
         system.set_volume(1.0).unwrap();
         assert_eq!(system.get_volume(), 1.0);
-        
+
         // Test frequency range
         system.set_frequency(20.0).unwrap();
         assert_eq!(system.get_frequency(), 20.0);
-        
+
         system.set_frequency(20000.0).unwrap();
         assert_eq!(system.get_frequency(), 20000.0);
-        
+
         // Test state transitions
         system.stop_beep().unwrap();
         assert!(!system.is_playing());
-        
+
         // Multiple play/stop cycles
         for _ in 0..5 {
             system.play_beep().unwrap();
@@ -303,16 +303,18 @@ mod tests {
     fn test_audio_system_error_edge_cases() {
         // Test with various invalid configurations
         use crate::audio::buzzer::WaveformType;
-        
+
         let invalid_configs = [
             BuzzerConfig::new().with_frequency(0.0).with_volume(0.0),
-            BuzzerConfig::new().with_frequency(f32::MAX).with_volume(1.0),
+            BuzzerConfig::new()
+                .with_frequency(f32::MAX)
+                .with_volume(1.0),
             BuzzerConfig::new().with_waveform(WaveformType::Triangle),
         ];
-        
+
         for config in invalid_configs {
             let stream_config = StreamConfig::new();
-            
+
             // These might fail or succeed depending on the config and environment
             let _result = AudioSystem::with_config(config.clone(), stream_config);
             // We just want to ensure no panics occur

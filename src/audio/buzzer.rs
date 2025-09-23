@@ -438,27 +438,31 @@ mod tests {
     #[test]
     fn test_all_waveform_types() {
         // Test each waveform type
-        for waveform in [WaveformType::Sine, WaveformType::Square, 
-                         WaveformType::Sawtooth, WaveformType::Triangle] {
+        for waveform in [
+            WaveformType::Sine,
+            WaveformType::Square,
+            WaveformType::Sawtooth,
+            WaveformType::Triangle,
+        ] {
             let config = BuzzerConfig::new().with_waveform(waveform);
             let mut test_buzzer = AudioBuzzer::new(config).unwrap();
-            
+
             test_buzzer.start_tone().unwrap();
             let samples: Vec<f32> = (0..100).map(|_| test_buzzer.next_sample()).collect();
-            
+
             // Each waveform should produce different patterns
             assert!(samples.iter().any(|&s| s != 0.0));
-            
+
             // Test waveform characteristics
             match waveform {
                 WaveformType::Square => {
                     // Square wave should have only +1.0 and -1.0 values (when volume scaled)
                     assert!(samples.iter().all(|&s| s.abs() <= test_buzzer.get_volume()));
-                },
+                }
                 WaveformType::Sine => {
                     // Sine wave should have smooth transitions
                     assert!(samples.windows(2).any(|w| (w[0] - w[1]).abs() < 0.1));
-                },
+                }
                 _ => {} // Basic checks for sawtooth/triangle
             }
         }
@@ -468,12 +472,13 @@ mod tests {
     fn test_buzzer_phase_wraparound() {
         let mut buzzer = create_test_buzzer();
         buzzer.start_tone().unwrap();
-        
+
         // Generate many samples to force phase wraparound
-        for _ in 0..48000 { // More than one second at 44.1kHz
+        for _ in 0..48000 {
+            // More than one second at 44.1kHz
             buzzer.next_sample();
         }
-        
+
         // Buzzer should still be functional after phase wraparound
         let sample = buzzer.next_sample();
         if buzzer.get_volume() > 0.0 {
@@ -486,11 +491,11 @@ mod tests {
         // Test frequency clamping
         let config = BuzzerConfig::new().with_frequency(-100.0);
         assert_eq!(config.frequency, 0.0); // Should clamp to 0
-        
-        // Test volume clamping  
+
+        // Test volume clamping
         let config = BuzzerConfig::new().with_volume(1.5);
         assert_eq!(config.volume, 1.0);
-        
+
         let config = BuzzerConfig::new().with_volume(-0.5);
         assert_eq!(config.volume, 0.0);
     }
@@ -499,14 +504,14 @@ mod tests {
     fn test_buzzer_state_management() {
         let buzzer = create_test_buzzer();
         let state = buzzer.get_state();
-        
+
         // Test shared state access
         {
             let state_lock = state.lock().unwrap();
             assert!(!state_lock.playing);
             assert_eq!(state_lock.phase, 0.0);
         }
-        
+
         // Test state configuration access
         let config = buzzer.config();
         assert_eq!(config.frequency, 440.0);

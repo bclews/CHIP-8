@@ -18,15 +18,16 @@ fn main() -> Result<()> {
         env_logger::init();
     }
 
-    if args.gui {
-        if let Some(rom_file) = args.rom_file {
-            run_gui(rom_file)?;
+    if let Some(rom_file) = args.rom_file.clone() {
+        // Direct ROM execution defaults to GUI
+        if args.command.is_none() {
+            run_gui(rom_file, args.config.as_ref(), args.profile.as_ref())?;
         } else {
-            eprintln!("Error: --gui requires a ROM file to be specified.");
-            std::process::exit(1);
+            // Has subcommand, use CLI
+            run_cli()?;
         }
     } else {
-        // Run the CLI application
+        // No ROM file, run CLI (for subcommands or help)
         run_cli()?;
     }
 

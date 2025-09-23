@@ -1,0 +1,35 @@
+# Retro Configuration - Authentic Amber Monitor Look
+# Usage: chip8 --config config-retro.toml roms/your-game.ch8
+
+[behavior]
+cpu_speed = 500  # Slower, more authentic timing
+memory_wraparound = true  # Classic CHIP-8 behavior
+strict_bounds = false
+timer_frequency = 60
+
+[graphics]
+scale_factor = 10
+# Amber CRT monitor colors
+foreground_color = { r = 255, g = 176, b = 0, a = 255 }
+background_color = { r = 20, g = 15, b = 0, a = 255 }
+smooth_scaling = false  # Sharp pixels for authentic look
+maintain_aspect_ratio = true
+
+[audio]
+frequency = 440.0
+volume = 0.5  # Louder for authentic beep
+waveform = "Square"  # Classic beep sound
+sample_rate = 44100
+buffer_size = 512
+
+[keyboard]
+capture_enabled = true
+polling_rate = 60
+handle_repeats = true
+repeat_delay = 250
+use_raw_input = false
+
+[debug]
+enabled = false
+break_on_error = false
+log_instructions = false

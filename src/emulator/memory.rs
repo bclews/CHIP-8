@@ -509,18 +509,18 @@ mod tests {
     #[test]
     fn test_memory_boundary_conditions() {
         let mut memory = Memory::new();
-        
+
         // Test exact boundary addresses
         assert!(memory.write_byte(0, 0x42).is_ok());
         assert_eq!(memory.read_byte(0).unwrap(), 0x42);
-        
+
         assert!(memory.write_byte(4095, 0x84).is_ok());
         assert_eq!(memory.read_byte(4095).unwrap(), 0x84);
-        
+
         // Test one past boundary in strict mode
         assert!(memory.write_byte(4096, 0x42).is_err());
         assert!(memory.read_byte(4096).is_err());
-        
+
         // Test large out-of-bounds addresses
         assert!(memory.write_byte(0xFFFF, 0x42).is_err());
         assert!(memory.read_byte(0xFFFF).is_err());
@@ -529,19 +529,19 @@ mod tests {
     #[test]
     fn test_wraparound_edge_cases() {
         let mut memory = Memory::new_with_wraparound(true);
-        
+
         // Test wraparound at exact boundary
         memory.write_byte(4096, 0x42).unwrap();
         assert_eq!(memory.read_byte(0).unwrap(), 0x42);
-        
+
         // Test multiple wraparounds
         memory.write_byte(4096 * 2, 0x84).unwrap();
         assert_eq!(memory.read_byte(0).unwrap(), 0x84);
-        
+
         // Test large address wraparound
         memory.write_byte(0x5234, 0xAB).unwrap(); // Should wrap to 0x1234
         assert_eq!(memory.read_byte(0x1234).unwrap(), 0xAB);
-        
+
         // Test word operations with wraparound
         memory.write_word(4095, 0x1234).unwrap(); // High byte at 4095, low byte wraps to 0
         assert_eq!(memory.read_byte(4095).unwrap(), 0x12);
@@ -552,18 +552,18 @@ mod tests {
     #[test]
     fn test_memory_copy_boundary_conditions() {
         let mut memory = Memory::new();
-        
+
         // Test copy at memory boundaries
         memory.write_byte(4093, 0xAA).unwrap();
         memory.write_byte(4094, 0xBB).unwrap();
         memory.write_byte(4095, 0xCC).unwrap();
-        
+
         // Copy to start of memory
         memory.copy(4093, 0, 3).unwrap();
         assert_eq!(memory.read_byte(0).unwrap(), 0xAA);
         assert_eq!(memory.read_byte(1).unwrap(), 0xBB);
         assert_eq!(memory.read_byte(2).unwrap(), 0xCC);
-        
+
         // Test copy that would exceed bounds
         assert!(memory.copy(4094, 0x200, 3).is_err());
     }
@@ -571,15 +571,15 @@ mod tests {
     #[test]
     fn test_memory_slice_edge_cases() {
         let memory = Memory::new();
-        
+
         // Test slice at exact boundary
         let slice = memory.get_slice(4095, 1).unwrap();
         assert_eq!(slice.len(), 1);
-        
+
         // Test zero-length slice
         let slice = memory.get_slice(0x200, 0).unwrap();
         assert_eq!(slice.len(), 0);
-        
+
         // Test slice that would exceed bounds
         assert!(memory.get_slice(4095, 2).is_err());
         assert!(memory.get_slice(4096, 1).is_err());
@@ -588,18 +588,18 @@ mod tests {
     #[test]
     fn test_font_address_comprehensive() {
         let memory = Memory::new();
-        
+
         // Test all valid font characters
         for i in 0u8..16 {
             let addr = memory.get_font_address(i).unwrap();
             assert_eq!(addr, FONT_START + (i as u16) * 5);
-            
+
             // Verify each character has valid data
             let font_data = memory.get_slice(addr, 5).unwrap();
             assert_eq!(font_data.len(), 5);
             assert!(font_data.iter().any(|&b| b != 0)); // Should have some non-zero bytes
         }
-        
+
         // Test comprehensive invalid font characters
         for invalid in [16, 17, 20, 255] {
             assert!(memory.get_font_address(invalid).is_err());

@@ -1,0 +1,99 @@
+# Chip-8 Emulator Configuration Example
+# Copy this file and modify it to customize your emulator settings
+# Usage: chip8 --config example-config.toml roms/your-game.ch8
+
+[behavior]
+# CPU execution speed in instructions per second (100-2000)
+# Classic CHIP-8: 500 Hz, Modern: 700 Hz
+cpu_speed = 700
+
+# Enable memory wraparound (classic CHIP-8 behavior)
+# When true, out-of-bounds memory access wraps around at 4KB boundary
+# When false, out-of-bounds access causes an error
+memory_wraparound = false
+
+# Enable strict bounds checking
+# When true, catches programming errors with detailed messages
+# When false, permits some out-of-bounds access
+strict_bounds = true
+
+# Timer update frequency in Hz (typically 60 Hz)
+timer_frequency = 60
+
+[graphics]
+# Display scale factor (1-20)
+# Higher values = larger window
+scale_factor = 12
+
+# Foreground color (RGBA values 0-255)
+# Default: Green { r = 0, g = 255, b = 0, a = 255 }
+foreground_color = { r = 0, g = 255, b = 0, a = 255 }
+
+# Background color (RGBA values 0-255)
+# Default: Black { r = 0, g = 0, b = 0, a = 255 }
+background_color = { r = 0, g = 0, b = 0, a = 255 }
+
+# Enable smooth scaling (vs. nearest-neighbor)
+# true = smoother but slightly blurry
+# false = sharp pixels, more authentic retro look
+smooth_scaling = true
+
+# Maintain 2:1 aspect ratio (CHIP-8 is 64x32)
+maintain_aspect_ratio = true
+
+[audio]
+# Buzzer frequency in Hz (typical range: 220-880)
+# Common values: 440 (A4), 523 (C5), 800 (higher beep)
+frequency = 440.0
+
+# Volume level (0.0 = silent, 1.0 = maximum)
+# Recommended: 0.3-0.5 to avoid ear fatigue
+volume = 0.3
+
+# Waveform type: "Sine", "Square", "Sawtooth", or "Triangle"
+# Square = classic beep sound
+# Sine = smoother, less harsh
+# Sawtooth = buzzy, retro
+# Triangle = mellow
+waveform = "Square"
+
+# Audio sample rate in Hz (typically 44100 or 48000)
+sample_rate = 44100
+
+# Audio buffer size in samples
+# Lower = less latency but more CPU usage
+# Higher = more latency but smoother playback
+buffer_size = 512
+
+[keyboard]
+# Enable keyboard input capture
+capture_enabled = true
+
+# Keyboard polling rate in Hz (1-1000)
+# Higher = more responsive but more CPU usage
+# Desktop: 60 Hz, Gaming: 120 Hz
+polling_rate = 60
+
+# Handle key repeat events
+# true = holding a key sends multiple press events
+# false = holding a key sends only one press event
+handle_repeats = true
+
+# Key repeat delay in milliseconds
+repeat_delay = 250
+
+# Use raw input mode (bypasses OS key repeat)
+use_raw_input = false
+
+[debug]
+# Enable debug mode
+# Shows additional diagnostic information
+enabled = false
+
+# Break execution on error
+# When true, emulator pauses when an error occurs
+break_on_error = false
+
+# Log each instruction execution
+# Warning: Very verbose, slows down emulation significantly
+log_instructions = false
