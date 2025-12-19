@@ -1,6 +1,10 @@
 # Chip-8 Emulator
 
-A modern Chip-8 emulator written in Rust with a focus on accuracy, clean architecture, and comprehensive testing.
+A modern Chip-8 emulator written in Rust.
+
+## What is Chip-8?
+
+Chip-8 is a simple, interpreted programming language originally developed in the late 1970s for do-it-yourself computer systems like the COSMAC VIP and DREAM 6800. These early machines typically used televisions as displays and had just 1-4KB of RAM. The language experienced a revival in the 1990s when interpreters were created for HP48 graphing calculators, leading to enhanced variants like Super Chip-48. Today, Chip-8 remains popular as an introduction to emulator development due to its straightforward instruction set and minimal hardware requirements.
 
 ## Features
 
