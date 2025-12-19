@@ -107,10 +107,13 @@ vgcore.*
 # ROMs and Game Files
 # =============================================================================
 
-# Chip-8 ROM files (but keep test ROMs in repository)
+# Ignore contents of roms folder but keep the folder itself
+roms/*
+!roms/.gitkeep
+
+# Chip-8 ROM files elsewhere (but keep test ROMs in repository)
 *.ch8
 *.c8
-!test_rom.ch8
 !tests/fixtures/test_roms/*.ch8
 !examples/*.ch8
 
