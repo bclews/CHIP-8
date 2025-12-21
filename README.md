@@ -19,7 +19,7 @@ Chip-8 is a simple, interpreted programming language originally developed in the
 ### 🎮 Interfaces
 
 - **GUI Mode**: Basic graphical interface with window-based rendering (default)
-- **CLI Tools**: ROM information and validation subcommands
+- **CLI Tools**: ROM information, validation, and screenshot capture subcommands
 - **Hardware Abstraction**: Display, Audio, and Input traits for flexible frontends
 
 ### 🔊 Audio System
@@ -144,6 +144,38 @@ chip8 validate roms/game.ch8
 # Validating ROM: roms/game.ch8
 # ✅ ROM validation passed
 ```
+
+#### Capture Screenshot
+
+Capture a PNG screenshot of the emulator display after running for a specified number of cycles (headless, no GUI required):
+
+```bash
+# Basic usage - saves to screenshot.png
+chip8 screenshot roms/game.ch8
+
+# Custom output file and cycles
+chip8 screenshot roms/game.ch8 --output my_screenshot.png --cycles 5000
+
+# With custom scale and colors
+chip8 screenshot roms/game.ch8 \
+    --output retro.png \
+    --scale 5 \
+    --foreground 00FF00 \
+    --background 000000
+
+# Via Makefile
+make screenshot ROM=roms/game.ch8 OUTPUT=screenshot.png CYCLES=1000
+```
+
+**Screenshot Options:**
+
+| Option         | Short | Default        | Description                        |
+| -------------- | ----- | -------------- | ---------------------------------- |
+| `--output`     | `-o`  | screenshot.png | Output PNG file path               |
+| `--cycles`     | `-c`  | 1000           | CPU cycles to run before capture   |
+| `--scale`      | `-s`  | 10             | Scale factor (1-20)                |
+| `--foreground` |       | FFFFFF         | Hex color for "on" pixels          |
+| `--background` |       | 000000         | Hex color for "off" pixels         |
 
 ### Command-Line Flags
 
@@ -315,7 +347,7 @@ make pre-commit
 The emulator has comprehensive test coverage:
 
 ```bash
-# Run all tests (219 total: 210 unit + 9 integration)
+# Run all tests (222 total: 213 unit + 9 integration)
 make test
 
 # Run only unit tests
@@ -327,13 +359,14 @@ make test-verbose
 
 **Test Suite:**
 
-- **210 Unit Tests**: Component-level testing
+- **213 Unit Tests**: Component-level testing
   - CPU instruction set (arithmetic, logic, jumps, memory)
   - Timer system
   - Memory management
   - Audio system (buzzer, waveforms, configuration)
   - Graphics rendering
   - Input handling
+  - CLI tools (screenshot, hex color parsing)
 - **9 Integration Tests**: Full system testing
   - ROM loading and execution
   - Hardware system integration
@@ -471,6 +504,7 @@ The emulator supports standard Chip-8 ROMs with the following specifications:
 - `pixels` - GPU-accelerated pixel buffer rendering
 - `cpal` - Cross-platform audio library
 - `rodio` - Audio playback
+- `image` - PNG image encoding for screenshots
 
 **Configuration:**
 

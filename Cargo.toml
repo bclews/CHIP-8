@@ -39,6 +39,9 @@ rodio = "0.17"
 # Random number generation
 rand = "0.8"
 
+# Image encoding for screenshot functionality
+image = { version = "0.25", default-features = false, features = ["png"] }
+
 [features]
 default = []
 debug-print = []

@@ -45,6 +45,7 @@ help:
 	@echo ""
 	@echo "Development:"
 	@echo "  run           Run the emulator (requires ROM file argument)"
+	@echo "  screenshot    Capture a screenshot of ROM display"
 	@echo "  watch         Watch for changes and rebuild"
 	@echo "  deps          Show dependency tree"
 	@echo ""
@@ -55,6 +56,7 @@ help:
 	@echo ""
 	@echo "Examples:"
 	@echo "  make run ROM=game.ch8"
+	@echo "  make screenshot ROM=game.ch8 OUTPUT=screenshot.png"
 	@echo "  make test-verbose"
 	@echo "  make release"
 
@@ -137,6 +139,20 @@ run: build
 	fi
 	@echo "🎮 Running Chip-8 emulator with $(ROM)..."
 	$(CARGO) run -- "$(ROM)"
+
+.PHONY: screenshot
+screenshot: build
+	@if [ -z "$(ROM)" ]; then \
+		echo "❌ ROM file required. Usage: make screenshot ROM=path/to/rom.ch8 [OUTPUT=screenshot.png] [CYCLES=1000] [SCALE=10]"; \
+		exit 1; \
+	fi
+	@echo "📸 Capturing screenshot of $(ROM)..."
+	$(CARGO) run -- screenshot "$(ROM)" \
+		$(if $(OUTPUT),--output "$(OUTPUT)") \
+		$(if $(CYCLES),--cycles $(CYCLES)) \
+		$(if $(SCALE),--scale $(SCALE)) \
+		$(if $(FG),--foreground $(FG)) \
+		$(if $(BG),--background $(BG))
 
 .PHONY: watch
 watch:
