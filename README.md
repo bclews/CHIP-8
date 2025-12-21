@@ -584,4 +584,15 @@ The collection includes 100+ ROMs organized by category:
 - `roms/chip8-roms/roms/demos/` - Demo programs
 - `roms/chip8-roms/roms/programs/` - Utility programs
 
+**CHIP-8 Archive:**
+
+The [CHIP-8 Archive](https://johnearnest.github.io/chip8Archive/) is a curated collection of modern CHIP-8 programs, also included as a submodule at `roms/chip8Archive/`.
+
+```bash
+# Example: Run Octojam games
+make run ROM=roms/chip8Archive/roms/br8kout.ch8
+make run ROM=roms/chip8Archive/roms/piper.ch8
+make run ROM=roms/chip8Archive/roms/snake.ch8
+```
+
 You can also place your own ROMs in the `roms/` directory.
