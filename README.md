@@ -561,5 +561,27 @@ make run ROM=roms/chip8-test-suite/bin/4-flags.ch8
 
 #### Other ROMs
 
-- Place your Chip-8 ROMs in the `roms/` directory
-- Classic games: Pong, Space Invaders, Tetris, etc.
+A collection of classic CHIP-8 games is included as a Git submodule at `roms/chip8-roms/`.
+
+**Popular Games:**
+
+```bash
+# Pong
+make run ROM=roms/chip8-roms/roms/games/Pong\ \(1\ player\).ch8
+
+# Space Invaders
+make run ROM=roms/chip8-roms/roms/games/Space\ Invaders\ \[David\ Winter\].ch8
+
+# Tetris
+make run ROM=roms/chip8-roms/roms/games/Tetris\ \[Fran\ Dachille,\ 1991\].ch8
+
+# Breakout
+make run ROM=roms/chip8-roms/roms/games/Breakout\ \[Carmelo\ Cortez,\ 1979\].ch8
+```
+
+The collection includes 100+ ROMs organized by category:
+- `roms/chip8-roms/roms/games/` - Classic games (Pong, Tetris, Space Invaders, etc.)
+- `roms/chip8-roms/roms/demos/` - Demo programs
+- `roms/chip8-roms/roms/programs/` - Utility programs
+
+You can also place your own ROMs in the `roms/` directory.
