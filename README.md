@@ -535,6 +535,31 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 ### Test ROMs
 
+This emulator was developed and validated using [Timendus's CHIP-8 Test Suite](https://github.com/Timendus/chip8-test-suite), an excellent collection of test ROMs for verifying CHIP-8 implementations. The test suite is included as a Git submodule (GPL v3 licensed).
+
+#### Running the Tests
+
+```bash
+# CHIP-8 Logo test
+make run ROM=roms/chip8-test-suite/bin/1-chip8-logo.ch8
+
+# IBM Logo test
+make run ROM=roms/chip8-test-suite/bin/2-ibm-logo.ch8
+
+# Instruction test (Corax+)
+make run ROM=roms/chip8-test-suite/bin/3-corax+.ch8
+
+# Flags test
+make run ROM=roms/chip8-test-suite/bin/4-flags.ch8
+```
+
+#### Test Screenshots
+
+| CHIP-8 Logo | IBM Logo |
+|-------------|----------|
+| ![CHIP-8 Logo](assets/screenshots/chip8-logo.png) | ![IBM Logo](assets/screenshots/ibm-logo.png) |
+
+#### Other ROMs
+
 - Place your Chip-8 ROMs in the `roms/` directory
-- Test ROMs can be found online (search for "chip8 test rom")
 - Classic games: Pong, Space Invaders, Tetris, etc.
